@@ -1,65 +1,125 @@
-import Image from "next/image";
+// app/page.tsx
+'use client';
 
-export default function Home() {
+import { FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Stack,
+  Divider,
+  Paper,
+} from '@mui/material';
+import GoogleIcon from '@mui/icons-material/Google';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import TwitterIcon from '@mui/icons-material/Twitter'; // Xの代わりにアイコンだけ拝借
+
+export default function SignInPage() {
+  const router = useRouter();
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // 今はバリデーションも認証もなしで /play へ
+    router.push('/play');
+  };
+
+  const handleSocialLogin = (provider: 'google' | 'x' | 'github') => {
+    // 今は全部 /play に飛ばすだけ
+    console.log(`Mock ${provider} login`);
+    router.push('/play');
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <Box
+      component="main"
+      sx={{
+        minHeight: '100vh',
+        bgcolor: '#0f172a', // ちょい暗め
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+      }}
+    >
+      <Paper
+        elevation={6}
+        sx={{
+          width: 400,
+          maxWidth: '100%',
+          p: 4,
+          borderRadius: 3,
+        }}
+      >
+        <Typography variant="h5" fontWeight="bold" gutterBottom align="center">
+          eラーニングADV ログイン
+        </Typography>
+        <Typography variant="body2" color="text.secondary" align="center" mb={3}>
+          AWS SAA × 三銃士 × ADV
+        </Typography>
+
+        <Box component="form" onSubmit={handleSubmit}>
+          <Stack spacing={2}>
+            <TextField
+              label="メールアドレス"
+              type="email"
+              name="email"
+              fullWidth
+              size="small"
+              autoComplete="email"
+              required
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <TextField
+              label="パスワード"
+              type="password"
+              name="password"
+              fullWidth
+              size="small"
+              autoComplete="current-password"
+              required
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 1 }}
+            >
+              ログイン
+            </Button>
+          </Stack>
+        </Box>
+
+        <Divider sx={{ my: 3 }}>または</Divider>
+
+        <Stack spacing={1}>
+          <Button
+            variant="outlined"
+            fullWidth
+            startIcon={<GoogleIcon />}
+            onClick={() => handleSocialLogin('google')}
           >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            Googleで続行
+          </Button>
+          <Button
+            variant="outlined"
+            fullWidth
+            startIcon={<TwitterIcon />}
+            onClick={() => handleSocialLogin('x')}
+          >
+            Xで続行
+          </Button>
+          <Button
+            variant="outlined"
+            fullWidth
+            startIcon={<GitHubIcon />}
+            onClick={() => handleSocialLogin('github')}
+          >
+            GitHubで続行
+          </Button>
+        </Stack>
+      </Paper>
+    </Box>
   );
 }
