@@ -50,7 +50,7 @@ export const chapter1AthosIntro: AdvChapter = {
       speakerName: 'アトス',
       text: 'ふ……言い切ったな。だったら、その覚悟が本物かどうか、俺が見極めてやろう。',
       // 必要なら次のノードへ
-      nextId: undefined,
+      nextId: 'athos_name_question',
     },
 
     // ④ 選択肢2 → 表情：angry
@@ -62,6 +62,54 @@ export const chapter1AthosIntro: AdvChapter = {
       expression: 'angry',
       speakerName: 'アトス',
       text: '迷いを抱えたまま走るやつほど、周りを巻き込んで転ぶ。……そのことは忘れるな。',
+      nextId: 'athos_name_question',
+    },
+
+    athos_name_question: {
+      id: 'athos_name_question',
+      kind: 'choice',
+      background: 'officeroom_day',
+      character: 'athos',
+      expression: 'plain',
+      speakerName: 'アトス',
+      text: 'ところでお前の名前は？名乗りたくなければ、今後お前のことは「ダルタニャン」と呼ぶことになるが……どうする？',
+      options: [
+        {
+          id: 'opt_change_name',
+          label: 'え、何でですか？ いやです。',
+          nextId: 'input_user_name',
+        },
+        {
+          id: 'opt_keep_default',
+          label: 'かまわないです。そのままで。',
+          nextId: 'athos_after_name', // デフォルト名のまま次へ
+        },
+      ],
+    },
+
+    // ★ 名前入力ノード
+    input_user_name: {
+      id: 'input_user_name',
+      kind: 'input',
+      background: 'officeroom_day',
+      character: 'athos',
+      expression: 'plain',
+      speakerName: 'アトス',
+      inputKind: 'NAME',
+      variableKey: 'userName',
+      promptText: 'では、お前の名前を教えろ。',
+      nextIdAfterSubmit: 'athos_after_name',
+    },
+
+    // ★ 名前確定後のセリフ（{userName} を後で置換）
+    athos_after_name: {
+      id: 'athos_after_name',
+      kind: 'line',
+      background: 'officeroom_day',
+      character: 'athos',
+      expression: 'happy',
+      speakerName: 'アトス',
+      text: 'ではこれからよろしく、{userName}。',
       nextId: undefined,
     },
   },

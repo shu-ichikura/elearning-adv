@@ -25,17 +25,22 @@ export type PlaySubState =
   | { kind: 'LEARNING_INTRO' }
   | { kind: 'LEARNING_LINK' };
 
+// 共通部分
+type PlayCommon = {
+  userName: string;  // ★ デフォルトは「ダルタニャン」
+};
+
 // --- mode（全体の状態） ---
 
 export type PlayMode =
-  | {
+  | ({
       mode: 'PLAYING';
       subState: PlaySubState;
 
       chapterId: string;
       currentNodeId: string;
-    }
-  | {
+    } & PlayCommon)
+  | ({
       mode: 'MENU_OPEN';
       menuView: 'LOG' | 'CHAPTERS';
       previous: {
@@ -43,4 +48,4 @@ export type PlayMode =
         chapterId: string;
         currentNodeId: string;
       };
-    };
+    } & PlayCommon);

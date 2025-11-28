@@ -20,6 +20,9 @@ type AdvSceneLayoutProps = {
   // CHOICE のときだけ渡す
   choiceOptions?: { id: string; label: string }[];
   onSelectChoice?: (optionId: string) => void;
+
+  // 任意のオーバーレイ（入力ポップアップなど）を子要素として渡す
+  children?: React.ReactNode;
 };
 
 const backgroundMap: Record<BackgroundKey, string> = {
@@ -36,6 +39,7 @@ export const AdvSceneLayout: React.FC<AdvSceneLayoutProps> = ({
   onNext,
   choiceOptions,
   onSelectChoice,
+  children,
 }) => {
   const hasChoice = choiceOptions && choiceOptions.length > 0 && onSelectChoice;
 
@@ -89,6 +93,13 @@ export const AdvSceneLayout: React.FC<AdvSceneLayoutProps> = ({
           </div>
         )}
       </div>
+
+      {/* children が渡されれば最前面に overlay 表示 */}
+      {children && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-auto">
+          {children}
+        </div>
+      )}
     </div>
   );
 };

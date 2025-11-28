@@ -6,6 +6,7 @@ import { PlayMode } from '@/state/playMode';
 import { playReducer, initialPlayState } from '@/state/playReducer';
 import { MainMenuModal } from '@/components/adv/MainMenuModal';
 import { AdvSceneLayout } from '@/components/adv/AdvSceneLayout';
+import { FreeInputPopup } from '@/components/adv/FreeInputPopup';
 import { chapter1AthosIntro } from '@/scenarios/adv/chapter1_athos_intro';
 
 export default function PlayPage() {
@@ -26,13 +27,19 @@ export default function PlayPage() {
       case 'NARRATION':
         // node.kind === 'line' を想定
         if (currentNode.kind !== 'line') return null;
+
+        const renderedText = currentNode.text.replace(
+          '{userName}',
+          state.userName
+        );
+
         return (
           <AdvSceneLayout
             background={currentNode.background}
             character={currentNode.character}
             expression={currentNode.expression}
             speakerName={currentNode.speakerName}
-            text={currentNode.text}
+            text={renderedText}
             onNext={() => dispatch({ type: 'click_next' })}
           />
         );
@@ -58,29 +65,23 @@ export default function PlayPage() {
 
       // 他の subState はいったん既存のままでもOK
       case 'FREE_INPUT_EDITING':
+        if (currentNode.kind !== 'input') return null;
         return (
-          <div className="p-4">
-            <p>（自由入力の質問文）</p>
-            <textarea
-              id="freeInput"
-              className="border w-full p-2"
-              placeholder="入力してください"
+          <AdvSceneLayout
+            background={currentNode.background}
+            character={currentNode.character}
+            expression={currentNode.expression}
+            speakerName={currentNode.speakerName}
+            text={currentNode.promptText} // ← セリフとして質問文
+          >
+            <FreeInputPopup
+              prompt={currentNode.promptText}
+              defaultValue={state.userName} // デフォ名を入れておいても良い
+              onSubmit={(value: string) =>
+                dispatch({ type: 'submit_free_input', text: value })
+              }
             />
-            <button
-              onClick={() => {
-                const el = document.getElementById(
-                  'freeInput'
-                ) as HTMLTextAreaElement | null;
-                dispatch({
-                  type: 'submit_free_input',
-                  text: el?.value ?? '',
-                });
-              }}
-              className="mt-4 px-4 py-2 bg-purple-500 text-white rounded"
-            >
-              送信
-            </button>
-          </div>
+          </AdvSceneLayout>
         );
 
       // ... FREE_INPUT_WAIT_AI / LEARNING_* / ANSWER_REVIEW は今のまま流用

@@ -28,10 +28,27 @@ export type AdvChoiceNode = AdvNodeBase & {
   options: AdvChoiceOption[];
 };
 
-export type AdvNode = AdvLineNode | AdvChoiceNode;
+export type AdvInputKind = 'NAME' | 'FREE_TALK';
+
+export type AdvInputNode = {
+  id: string;
+  kind: 'input';
+  background: 'officeroom_day' | 'officeroom_night';
+  character: 'athos' | 'porthos' | 'aramis' | 'dartagnan';
+  expression: 'plain' | 'happy' | 'angry';
+  speakerName: string;
+
+  inputKind: 'NAME';          // いまは名づけだけ
+  variableKey: 'userName';    // 更新する変数キー
+  promptText: string;
+  nextIdAfterSubmit: string;
+};
+
+export type AdvNode = AdvLineNode | AdvChoiceNode | AdvInputNode;
 
 export type AdvChapter = {
   id: string;
   firstNodeId: string;
   nodes: Record<string, AdvNode>;
 };
+
