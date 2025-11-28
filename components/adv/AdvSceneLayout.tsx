@@ -52,17 +52,25 @@ export const AdvSceneLayout: React.FC<AdvSceneLayoutProps> = ({
 
       {/* 上部：立ち絵エリア（全体の上 70% くらい） */}
       <div className="absolute inset-x-0 top-0 bottom-40">
+
+        {/* CHOICE のとき → overlay を表示 */}
+        {hasChoice && (
+            <div className="absolute inset-0 bg-black/40 z-10"></div>
+        )}
+
         {/* 立ち絵 */}
-        <div className="w-full h-full flex items-end justify-center pointer-events-none">
-          <CharacterSprite character={character} expression={expression} />
+        <div className="w-full h-full flex items-end justify-center pointer-events-none relative z-0">
+            <CharacterSprite character={character} expression={expression} />
         </div>
 
         {/* 選択肢ポップアップ（あれば） */}
         {hasChoice && (
-          <ChoicePopup
-            options={choiceOptions!}
-            onSelect={onSelectChoice!}
-          />
+            <div className="relative z-20">
+            <ChoicePopup
+                options={choiceOptions!}
+                onSelect={onSelectChoice!}
+            />
+            </div>
         )}
       </div>
 

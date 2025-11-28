@@ -16,7 +16,7 @@ export const ChoicePopup: React.FC<ChoicePopupProps> = ({
   onSelect,
 }) => {
   return (
-    <div className="absolute inset-x-0 top-8 flex justify-center z-20">
+    <div className="absolute inset-x-0 bottom-16 flex justify-center z-20">
       <div className="bg-black/70 text-white rounded-xl px-6 py-4 shadow-lg max-w-xl w-[90%]">
         <div className="space-y-2">
           {options.map((opt) => (
