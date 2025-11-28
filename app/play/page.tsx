@@ -1,19 +1,15 @@
+// /app/play/page.tsx
 'use client';
 
 import { useReducer } from 'react';
-import {
-  PlayMode,
-  PlayEvent,
-  PlaySubState,
-} from '@/state/playMode';
+import { PlayMode } from '@/state/playMode';
 import { playReducer, initialPlayState } from '@/state/playReducer';
 import { MainMenuModal } from '@/components/adv/MainMenuModal';
 import { AdvSceneLayout } from '@/components/adv/AdvSceneLayout';
+import { chapter1AthosIntro } from '@/scenarios/adv/chapter1_athos_intro';
 
 export default function PlayPage() {
   const [state, dispatch] = useReducer(playReducer, initialPlayState);
-
-  // ---- UIレンダリング ------------------------------------------------------
 
   const renderContent = () => {
     if (state.mode === 'MENU_OPEN') {
@@ -22,49 +18,45 @@ export default function PlayPage() {
       );
     }
 
-    // PLAYING mode
-    const sub = state.subState;
+    // --- PLAYING モードのとき ---
+    const chapter = chapter1AthosIntro; // 今は 1 章固定。将来は state.chapterId から引く
+    const currentNode = chapter.nodes[state.currentNodeId];
 
-    switch (sub.kind) {
+    switch (state.subState.kind) {
       case 'NARRATION':
+        // node.kind === 'line' を想定
+        if (currentNode.kind !== 'line') return null;
         return (
-        <AdvSceneLayout
-          background="officeroom_day"
-          character="athos"
-          expression="plain"
-          speakerName="アトス"
-          text="……お前の“人類幸福計画”とやら、少しだけ話を聞いてやろう。"
-          onNext={() => dispatch({ type: 'click_next' })}
-        />
+          <AdvSceneLayout
+            background={currentNode.background}
+            character={currentNode.character}
+            expression={currentNode.expression}
+            speakerName={currentNode.speakerName}
+            text={currentNode.text}
+            onNext={() => dispatch({ type: 'click_next' })}
+          />
         );
 
       case 'CHOICE':
+        if (currentNode.kind !== 'choice') return null;
         return (
-          <div className="p-4">
-            <p>（質問文）</p>
-            <div className="mt-4 space-y-2">
-              {/* 実際には options 配列をシナリオから取得 */}
-              <button
-                onClick={() =>
-                  dispatch({ type: 'click_choice', optionId: 'opt1' })
-                }
-                className="block w-full px-4 py-2 bg-green-500 text-white rounded"
-              >
-                選択肢1
-              </button>
-
-              <button
-                onClick={() =>
-                  dispatch({ type: 'click_choice', optionId: 'opt2' })
-                }
-                className="block w-full px-4 py-2 bg-green-500 text-white rounded"
-              >
-                選択肢2
-              </button>
-            </div>
-          </div>
+          <AdvSceneLayout
+            background={currentNode.background}
+            character={currentNode.character}
+            expression={currentNode.expression}
+            speakerName={currentNode.speakerName}
+            text={currentNode.text} // ← 質問文はここに表示
+            choiceOptions={currentNode.options.map((opt) => ({
+              id: opt.id,
+              label: opt.label,
+            }))}
+            onSelectChoice={(optionId) =>
+              dispatch({ type: 'click_choice', optionId })
+            }
+          />
         );
 
+      // 他の subState はいったん既存のままでもOK
       case 'FREE_INPUT_EDITING':
         return (
           <div className="p-4">
@@ -91,67 +83,12 @@ export default function PlayPage() {
           </div>
         );
 
-      case 'FREE_INPUT_WAIT_AI':
-        return (
-          <div className="p-4">
-            <p>AI返信待ち…</p>
-          </div>
-        );
+      // ... FREE_INPUT_WAIT_AI / LEARNING_* / ANSWER_REVIEW は今のまま流用
 
-      case 'LEARNING_INTRO':
-        return (
-          <div className="p-4">
-            <p>（学習導入セリフ）</p>
-            <button
-              onClick={() => dispatch({ type: 'click_learning_start' })}
-              className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded"
-            >
-              学習へ進む
-            </button>
-          </div>
-        );
-
-      case 'LEARNING_LINK':
-        return (
-          <div className="p-4">
-            <p>（動画リンク）</p>
-            <a
-              href="https://example.com"
-              target="_blank"
-              className="underline text-blue-600"
-            >
-              外部動画を開く
-            </a>
-
-            <button
-              onClick={() =>
-                dispatch({
-                  type: 'click_learning_complete',
-                })
-              }
-              className="mt-4 px-4 py-2 bg-green-600 text-white rounded"
-            >
-              受講完了
-            </button>
-          </div>
-        );
-
-      case 'ANSWER_REVIEW':
-        return (
-          <div className="p-4">
-            <p>（正誤・解説テキスト）</p>
-            <button
-              onClick={() => dispatch({ type: 'click_next' })}
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-            >
-              次へ
-            </button>
-          </div>
-        );
+      default:
+        return null;
     }
   };
-
-  // ---- ページ全体のレイアウト --------------------------------------------
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100 relative">
@@ -162,7 +99,7 @@ export default function PlayPage() {
         MENU
       </button>
 
-      <div className="w-[800px] h-[600px] bg-white shadow-lg p-6">
+      <div className="w-[800px] h-[600px] bg-white shadow-lg p-6 relative overflow-hidden">
         {renderContent()}
       </div>
     </div>

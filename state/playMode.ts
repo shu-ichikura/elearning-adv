@@ -31,9 +31,16 @@ export type PlayMode =
   | {
       mode: 'PLAYING';
       subState: PlaySubState;
+
+      chapterId: string;
+      currentNodeId: string;
     }
   | {
       mode: 'MENU_OPEN';
       menuView: 'LOG' | 'CHAPTERS';
-      previous: PlaySubState; // 戻る先
+      previous: {
+        subState: PlaySubState;
+        chapterId: string;
+        currentNodeId: string;
+      };
     };

@@ -22,7 +22,7 @@ export const CharacterSprite = ({ character, expression }: CharacterSpriteProps)
           className="
             object-contain
             scale-180       /* 拡大率：好みに応じて 1.2〜1.6 くらいで調整 */
-            translate-y-40  /* 画像を少し下にずらす → 頭が中央寄りになる */
+            translate-y-60  /* 画像を少し下にずらす → 頭が中央寄りになる */
           "
           priority
         />
