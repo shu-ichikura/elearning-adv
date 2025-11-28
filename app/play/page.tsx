@@ -1,101 +1,172 @@
-// app/play/page.tsx
 'use client';
 
-import { useState } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import { useReducer } from 'react';
+import {
+  PlayMode,
+  PlayEvent,
+  PlaySubState,
+} from '@/state/playMode';
+import { playReducer, initialPlayState } from '@/state/playReducer';
 import { MainMenuModal } from '@/components/adv/MainMenuModal';
 
 export default function PlayPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [state, dispatch] = useReducer(playReducer, initialPlayState);
+
+  // ---- UIレンダリング ------------------------------------------------------
+
+  const renderContent = () => {
+    if (state.mode === 'MENU_OPEN') {
+      return (
+        <MainMenuModal onClose={() => dispatch({ type: 'click_menu_close' })} />
+      );
+    }
+
+    // PLAYING mode
+    const sub = state.subState;
+
+    switch (sub.kind) {
+      case 'NARRATION':
+        return (
+          <div className="p-4">
+            <div>（立ち絵表示）</div>
+            <p className="mt-4">（セリフ）</p>
+
+            <button
+              onClick={() => dispatch({ type: 'click_next' })}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              次へ
+            </button>
+          </div>
+        );
+
+      case 'CHOICE':
+        return (
+          <div className="p-4">
+            <p>（質問文）</p>
+            <div className="mt-4 space-y-2">
+              {/* 実際には options 配列をシナリオから取得 */}
+              <button
+                onClick={() =>
+                  dispatch({ type: 'click_choice', optionId: 'opt1' })
+                }
+                className="block w-full px-4 py-2 bg-green-500 text-white rounded"
+              >
+                選択肢1
+              </button>
+
+              <button
+                onClick={() =>
+                  dispatch({ type: 'click_choice', optionId: 'opt2' })
+                }
+                className="block w-full px-4 py-2 bg-green-500 text-white rounded"
+              >
+                選択肢2
+              </button>
+            </div>
+          </div>
+        );
+
+      case 'FREE_INPUT_EDITING':
+        return (
+          <div className="p-4">
+            <p>（自由入力の質問文）</p>
+            <textarea
+              id="freeInput"
+              className="border w-full p-2"
+              placeholder="入力してください"
+            />
+            <button
+              onClick={() => {
+                const el = document.getElementById(
+                  'freeInput'
+                ) as HTMLTextAreaElement | null;
+                dispatch({
+                  type: 'submit_free_input',
+                  text: el?.value ?? '',
+                });
+              }}
+              className="mt-4 px-4 py-2 bg-purple-500 text-white rounded"
+            >
+              送信
+            </button>
+          </div>
+        );
+
+      case 'FREE_INPUT_WAIT_AI':
+        return (
+          <div className="p-4">
+            <p>AI返信待ち…</p>
+          </div>
+        );
+
+      case 'LEARNING_INTRO':
+        return (
+          <div className="p-4">
+            <p>（学習導入セリフ）</p>
+            <button
+              onClick={() => dispatch({ type: 'click_learning_start' })}
+              className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded"
+            >
+              学習へ進む
+            </button>
+          </div>
+        );
+
+      case 'LEARNING_LINK':
+        return (
+          <div className="p-4">
+            <p>（動画リンク）</p>
+            <a
+              href="https://example.com"
+              target="_blank"
+              className="underline text-blue-600"
+            >
+              外部動画を開く
+            </a>
+
+            <button
+              onClick={() =>
+                dispatch({
+                  type: 'click_learning_complete',
+                })
+              }
+              className="mt-4 px-4 py-2 bg-green-600 text-white rounded"
+            >
+              受講完了
+            </button>
+          </div>
+        );
+
+      case 'ANSWER_REVIEW':
+        return (
+          <div className="p-4">
+            <p>（正誤・解説テキスト）</p>
+            <button
+              onClick={() => dispatch({ type: 'click_next' })}
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+            >
+              次へ
+            </button>
+          </div>
+        );
+    }
+  };
+
+  // ---- ページ全体のレイアウト --------------------------------------------
 
   return (
-    <Box
-      component="main"
-      sx={{
-        minHeight: '100vh',
-        bgcolor: '#ffffff', // 外側を白くする
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        p: 4,
-      }}
-    >
-      {/* メインビュー（ここにADVコンポーネントを後で詰め込む） */}
-      <Box
-        sx={{
-          width: '100%',
-          maxWidth: 1000,
-          aspectRatio: '16 / 9',
-          bgcolor: '#111827',
-          borderRadius: 3,
-          border: '2px solid #facc15', // 明るい黄色の枠
-          boxShadow: 'none',
-          overflow: 'hidden',
-          position: 'relative',
-          p: 2,
-        }}
+    <div className="w-full h-screen flex items-center justify-center bg-gray-100 relative">
+      <button
+        onClick={() => dispatch({ type: 'click_menu_open' })}
+        className="absolute top-4 right-4 bg-gray-700 text-white px-3 py-2 rounded"
       >
-        {/* 右上の MENU ボタン */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            zIndex: 20,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-          }}
-        >
-          <IconButton
-            size="small"
-            sx={{
-              bgcolor: 'rgba(15,23,42,0.8)',
-              border: '1px solid rgba(250,204,21,0.7)',
-              color: '#facc15',
-              '&:hover': {
-                bgcolor: 'rgba(24,35,58,0.95)',
-              },
-            }}
-            onClick={() => setIsMenuOpen(true)}
-          >
-            <MenuIcon fontSize="small" />
-          </IconButton>
-          <Typography
-            variant="caption"
-            sx={{ color: '#facc15', textShadow: '0 0 4px rgba(0,0,0,0.8)' }}
-          >
-            MENU
-          </Typography>
-        </Box>
+        MENU
+      </button>
 
-        {/* メインビューの中身（今はプレースホルダ） */}
-        <Box
-          sx={{
-            width: '100%',
-            height: '100%',
-            borderRadius: 2,
-            border: '1px dashed rgba(250,204,21,0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#e5e7eb',
-            flexDirection: 'column',
-            gap: 1,
-          }}
-        >
-          <Typography variant="h6" fontWeight="bold">
-            ADVメインビュー
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            ここに背景・立ち絵・セリフウィンドウ・選択肢などを載せていく
-          </Typography>
-        </Box>
-
-        {/* メインビュー内にだけ出るメニュー・モーダル */}
-        {isMenuOpen && <MainMenuModal onClose={() => setIsMenuOpen(false)} />}
-      </Box>
-    </Box>
+      <div className="w-[800px] h-[600px] bg-white shadow-lg p-6">
+        {renderContent()}
+      </div>
+    </div>
   );
 }
