@@ -8,6 +8,7 @@ import {
 } from '@/state/playMode';
 import { playReducer, initialPlayState } from '@/state/playReducer';
 import { MainMenuModal } from '@/components/adv/MainMenuModal';
+import { AdvSceneLayout } from '@/components/adv/AdvSceneLayout';
 
 export default function PlayPage() {
   const [state, dispatch] = useReducer(playReducer, initialPlayState);
@@ -27,17 +28,14 @@ export default function PlayPage() {
     switch (sub.kind) {
       case 'NARRATION':
         return (
-          <div className="p-4">
-            <div>（立ち絵表示）</div>
-            <p className="mt-4">（セリフ）</p>
-
-            <button
-              onClick={() => dispatch({ type: 'click_next' })}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              次へ
-            </button>
-          </div>
+        <AdvSceneLayout
+          background="officeroom_day"
+          character="athos"
+          expression="plain"
+          speakerName="アトス"
+          text="……お前の“人類幸福計画”とやら、少しだけ話を聞いてやろう。"
+          onNext={() => dispatch({ type: 'click_next' })}
+        />
         );
 
       case 'CHOICE':
